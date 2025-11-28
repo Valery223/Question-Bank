@@ -41,6 +41,7 @@ type OptionResponse struct {
 
 func (r *CreateQuestionRequest) ToDomain() *domain.Question {
 	q := &domain.Question{
+		ID:         "0", // FIXME: убрать как-то
 		Role:       domain.RoleQuestionnaire(r.Role),
 		Topic:      r.Topic,
 		Type:       domain.QuestionType(r.Type),
