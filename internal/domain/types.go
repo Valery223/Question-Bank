@@ -8,7 +8,12 @@ var (
 	ErrEmptyText         = errors.New("text cannot be empty")
 	ErrNoOptions         = errors.New("choice question must have at least 2 options")
 	ErrInvalidType       = errors.New("unknown question type")
+	ErrUnauthorized      = errors.New("unauthorized")
+	ErrForbidden         = errors.New("forbidden")
 )
+
+// Пусть  везде будет string ID
+type ID string
 
 // --- Enums ---
 

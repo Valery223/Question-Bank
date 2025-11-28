@@ -3,9 +3,9 @@ package domain
 import "time"
 
 type TestSession struct {
-	ID         string
-	TemolateID string
-	UserId     string
+	ID         ID
+	TemplateID ID
+	UserId     ID
 	StartedAt  time.Time
 	ExpiredAt  time.Time
 

@@ -2,7 +2,7 @@ package domain
 
 // Option - Вариант ответа
 type Option struct {
-	ID int
+	ID ID
 	// QuestionID int - В Go внутри домена это поле часто не нужно,
 	// так как Option всегда "живет" внутри Question. Но для SQL удобно иметь.
 	Text      string
@@ -11,7 +11,7 @@ type Option struct {
 
 // Question - Агрегат (Корень)
 type Question struct {
-	ID         int
+	ID         ID
 	Role       RoleQuestionnaire
 	Topic      string
 	Type       QuestionType

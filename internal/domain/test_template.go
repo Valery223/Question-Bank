@@ -1,7 +1,7 @@
 package domain
 
 type TestTemplate struct {
-	ID      string
+	ID      ID
 	Name    string
 	Role    RoleQuestionnaire
 	Purpose TemplatePurpose
