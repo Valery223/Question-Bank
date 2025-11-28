@@ -6,6 +6,7 @@ import (
 
 	"github.com/Valery223/Question-Bank/internal/domain"
 	"github.com/Valery223/Question-Bank/internal/usecase/ports"
+	"github.com/google/uuid"
 )
 
 // QuestionUseCase - группирует логику вокруг вопросов
@@ -44,6 +45,9 @@ func (uc *QuestionUseCase) CreateQuestion(ctx context.Context, q *domain.Questio
 		uc.log.Warn("User does not have permission to create questions", "userID", userID)
 		return domain.ErrForbidden
 	}
+
+	id := uuid.New().String()
+	q.ID = domain.ID(id)
 
 	return uc.questionRepo.Create(ctx, q)
 }

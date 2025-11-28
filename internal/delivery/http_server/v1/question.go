@@ -17,7 +17,8 @@ func (h *Handler) CreateQuestion(c *gin.Context) {
 
 	//  Вызов UseCase
 	// Превращаем DTO в Domain и передаем контекст
-	err := h.questionUC.CreateQuestion(c.Request.Context(), req.ToDomain())
+	var q = req.ToDomain()
+	err := h.questionUC.CreateQuestion(c.Request.Context(), q)
 
 	if err != nil {
 		// Тут можно проверить ошибку через errors.Is(err, domain.ErrInvalidDifficulty)
@@ -26,7 +27,8 @@ func (h *Handler) CreateQuestion(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"status": "created"})
+	var resp = QuestionToResponse(q)
+	c.JSON(http.StatusCreated, gin.H{"status": "created", "question": resp})
 }
 
 func (h *Handler) GetQuestionByID(c *gin.Context) {
