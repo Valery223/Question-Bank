@@ -5,7 +5,7 @@ import "time"
 type TestSession struct {
 	ID         ID
 	TemplateID ID
-	UserId     ID
+	UserID     ID
 	StartedAt  time.Time
 	ExpiredAt  time.Time
 

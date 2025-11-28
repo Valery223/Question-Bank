@@ -46,3 +46,7 @@ func (r UserRole) CanDeleteTemplates() bool {
 func (r UserRole) CanViewTemplates() bool {
 	return r == RoleAdmin || r == RoleManager
 }
+
+func (r UserRole) CanCreateSessions() bool {
+	return r == RoleAdmin || r == RoleManager || r == RoleUser
+}
