@@ -18,6 +18,12 @@ func NewRouter(handler *v1.Handler) *gin.Engine {
 		questions.POST("/", handler.CreateQuestion)
 		questions.GET("/:id", handler.GetQuestionByID)
 		// questions.GET("", handler.ListQuestions)
+
+		// Templates
+		templates := api.Group("/templates")
+		templates.POST("/", handler.CreateTemplate)
+		templates.GET("/:id", handler.GetTemplateByID)
+		// templates.GET("", handler.ListTemplates)
 	}
 
 	return router

@@ -19,12 +19,14 @@ func NewApp() *gin.Engine {
 	}))
 
 	// Инициализация репозиториев
-	questionRepo := memory.NewMemoryRepository()
-
+	repo := memory.NewMemoryRepository()
+	questionRepo := memory.NewQuestionsRepository(repo)
+	templateRepo := memory.NewTemplateRepository(repo)
 	// Инициализация usecase слоев
 	questionUC := usecase.NewQuestionUseCase(questionRepo, logger)
+	templateUC := usecase.NewTemplateUseCase(templateRepo, questionRepo, logger)
 
-	handler := v1.NewHandler(*questionUC, logger)
+	handler := v1.NewHandler(*questionUC, *templateUC, logger)
 	router := httpServer.NewRouter(handler)
 
 	return router

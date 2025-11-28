@@ -10,12 +10,19 @@ type CreateQuestionRequest struct {
 	Type       string          `json:"type" binding:"required"`
 	Difficulty int             `json:"difficulty" binding:"required"`
 	Text       string          `json:"text" binding:"required"`
-	Options    []OptionRequest `json:"options"`
+	Options    []OptionRequest `json:"options, required,min=2""`
 }
 
 type OptionRequest struct {
 	Text     string `json:"text" binding:"required"`
-	IsAnswer bool   `json:"is_answer" binding:"required"`
+	IsAnswer bool   `json:"is_answer"` // false по умолчанию
+}
+
+type CreateTemplateRequest struct {
+	Name        string   `json:"name" binding:"required"`
+	Role        string   `json:"role" binding:"required"`
+	Purpose     string   `json:"purpose" binding:"required"`
+	QuestionIDs []string `json:"question_ids" binding:"required,min=1"`
 }
 
 // --- Responses (Исходящие данные) ---
@@ -34,6 +41,27 @@ type OptionResponse struct {
 	ID       string `json:"id"`
 	Text     string `json:"text"`
 	IsAnswer bool   `json:"is_answer"`
+}
+
+// Ответ для шаблона теста
+//
+// Включает список ID вопросов
+// Если нужны будут полные вопросы, то можно всделать отдельный эндпоинт для получения вопросов по шаблону
+// Напри
+type TemplateResponse struct {
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Role        string   `json:"role"`
+	Purpose     string   `json:"purpose"`
+	QuestionIDs []string `json:"question_ids"` // Список ID вопросов
+}
+
+type TemplateDetailsResponse struct {
+	ID        string             `json:"id"`
+	Name      string             `json:"name"`
+	Role      string             `json:"role"`
+	Purpose   string             `json:"purpose"`
+	Questions []QuestionResponse `json:"questions"` // Полные вопросы
 }
 
 // --- Mappers (Преобразователи DTO <-> Domain) ---
@@ -59,7 +87,24 @@ func (r *CreateQuestionRequest) ToDomain() *domain.Question {
 	return q
 }
 
+func (t *CreateTemplateRequest) ToDomain() *domain.TestTemplate {
+	td := &domain.TestTemplate{
+		Name:        t.Name,
+		Role:        domain.RoleQuestionnaire(t.Role),
+		Purpose:     domain.TemplatePurpose(t.Purpose),
+		QuestionIDs: make([]domain.ID, len(t.QuestionIDs)),
+	}
+
+	for i, id := range t.QuestionIDs {
+		td.QuestionIDs[i] = domain.ID(id)
+	}
+
+	return td
+}
+
+// ---
 // Из домена в DTO ответа
+
 func QuestionToResponse(q *domain.Question) *QuestionResponse {
 	resp := &QuestionResponse{
 		ID:         string(q.ID),
@@ -77,6 +122,38 @@ func QuestionToResponse(q *domain.Question) *QuestionResponse {
 			Text:     opt.Text,
 			IsAnswer: opt.IsCorrect,
 		}
+	}
+
+	return resp
+}
+
+func TemplateToResponse(t *domain.TestTemplate) *TemplateResponse {
+	return &TemplateResponse{
+		ID:      string(t.ID),
+		Name:    t.Name,
+		Role:    string(t.Role),
+		Purpose: string(t.Purpose),
+		QuestionIDs: func() []string {
+			ids := make([]string, len(t.QuestionIDs))
+			for i, id := range t.QuestionIDs {
+				ids[i] = string(id)
+			}
+			return ids
+		}(),
+	}
+}
+
+func TemplateDetailsToResponse(t *domain.TestTemplate, questions []domain.Question) *TemplateDetailsResponse {
+	resp := &TemplateDetailsResponse{
+		ID:        string(t.ID),
+		Name:      t.Name,
+		Role:      string(t.Role),
+		Purpose:   string(t.Purpose),
+		Questions: make([]QuestionResponse, len(questions)),
+	}
+
+	for i, q := range questions {
+		resp.Questions[i] = *QuestionToResponse(&q)
 	}
 
 	return resp

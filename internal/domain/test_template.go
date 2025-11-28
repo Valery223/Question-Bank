@@ -6,7 +6,7 @@ type TestTemplate struct {
 	Role    RoleQuestionnaire
 	Purpose TemplatePurpose
 
-	Questions []Question
+	QuestionIDs []ID // Список ID вопросов
 }
 
 // Validate проверяет инварианты сущности
@@ -22,5 +22,6 @@ func (tt *TestTemplate) Validate() error {
 	if !tt.Purpose.IsValid() {
 		return ErrInvalidType
 	}
+
 	return nil
 }

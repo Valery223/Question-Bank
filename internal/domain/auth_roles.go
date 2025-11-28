@@ -34,3 +34,15 @@ func (r UserRole) CanViewQuestions() bool {
 func (r UserRole) CanUpdateQuestions() bool {
 	return r == RoleAdmin || r == RoleManager
 }
+
+func (r UserRole) CanCreateTemplates() bool {
+	return r == RoleAdmin || r == RoleManager
+}
+
+func (r UserRole) CanDeleteTemplates() bool {
+	return r == RoleAdmin || r == RoleManager
+}
+
+func (r UserRole) CanViewTemplates() bool {
+	return r == RoleAdmin || r == RoleManager
+}

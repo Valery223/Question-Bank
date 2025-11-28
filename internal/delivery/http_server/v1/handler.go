@@ -9,12 +9,14 @@ import (
 
 type Handler struct {
 	questionUC usecase.QuestionUseCase
+	templateUC usecase.TemplateUseCase
 	logger     *slog.Logger
 }
 
-func NewHandler(qUC usecase.QuestionUseCase, logger *slog.Logger) *Handler {
+func NewHandler(qUC usecase.QuestionUseCase, tUC usecase.TemplateUseCase, logger *slog.Logger) *Handler {
 	return &Handler{
 		questionUC: qUC,
+		templateUC: tUC,
 		logger:     logger,
 	}
 }
