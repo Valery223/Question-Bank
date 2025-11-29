@@ -66,6 +66,8 @@ func (r *TestSessionRepository) GetSession(ctx context.Context, id domain.ID) (*
 	session := &domain.TestSession{}
 
 	var questionsBytes []byte
+	var sqlUserID sql.NullString
+	var sqlTemplateID sql.NullString
 
 	query := `
 		SELECT id, template_id, user_id, started_at, expired_at, questions_snapshot
@@ -76,8 +78,8 @@ func (r *TestSessionRepository) GetSession(ctx context.Context, id domain.ID) (*
 	row := r.db.QueryRowContext(ctx, query, id)
 	err := row.Scan(
 		&session.ID,
-		&session.TemplateID,
-		&session.UserID,
+		&sqlTemplateID,
+		&sqlUserID,
 		&session.StartedAt,
 		&session.ExpiredAt,
 		&questionsBytes,
@@ -93,6 +95,18 @@ func (r *TestSessionRepository) GetSession(ctx context.Context, id domain.ID) (*
 	err = json.Unmarshal(questionsBytes, &session.Questions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal session questions: %w", err)
+	}
+
+	if sqlUserID.Valid {
+		session.UserID = domain.ID(sqlUserID.String)
+	} else {
+		session.UserID = ""
+	}
+
+	if sqlTemplateID.Valid {
+		session.TemplateID = domain.ID(sqlTemplateID.String)
+	} else {
+		session.TemplateID = ""
 	}
 
 	return session, nil
