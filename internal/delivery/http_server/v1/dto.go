@@ -25,6 +25,10 @@ type CreateTemplateRequest struct {
 	QuestionIDs []string `json:"question_ids" binding:"required,min=1"`
 }
 
+type CreateTestSessionRequest struct {
+	TemplateID string `json:"template_id" binding:"required"`
+}
+
 // --- Responses (Исходящие данные) ---
 
 type QuestionResponse struct {
@@ -41,6 +45,11 @@ type OptionResponse struct {
 	ID       string `json:"id"`
 	Text     string `json:"text"`
 	IsAnswer bool   `json:"is_answer"`
+}
+
+type TestSessionResponse struct {
+	ID        string             `json:"session_id"`
+	Questions []QuestionResponse `json:"questions"`
 }
 
 // Ответ для шаблона теста
@@ -102,6 +111,14 @@ func (t *CreateTemplateRequest) ToDomain() *domain.TestTemplate {
 	return td
 }
 
+func (r *CreateTestSessionRequest) ToDomain() *domain.TestSession {
+	ts := &domain.TestSession{
+		TemplateID: domain.ID(r.TemplateID),
+	}
+
+	return ts
+}
+
 // ---
 // Из домена в DTO ответа
 
@@ -153,6 +170,19 @@ func TemplateDetailsToResponse(t *domain.TestTemplate, questions []domain.Questi
 	}
 
 	for i, q := range questions {
+		resp.Questions[i] = *QuestionToResponse(&q)
+	}
+
+	return resp
+}
+
+func TestSessionToResponse(s *domain.TestSession) *TestSessionResponse {
+	resp := &TestSessionResponse{
+		ID:        string(s.ID),
+		Questions: make([]QuestionResponse, len(s.Questions)),
+	}
+
+	for i, q := range s.Questions {
 		resp.Questions[i] = *QuestionToResponse(&q)
 	}
 

@@ -26,53 +26,51 @@ func NewSessionUseCase(sr ports.TestSessionRepository, tr ports.TemplateReposito
 	}
 }
 
-func (uc *SessionUseCase) CreateSession(ctx context.Context, templateID domain.ID) (*domain.TestSession, error) {
+func (uc *SessionUseCase) CreateSession(ctx context.Context, session *domain.TestSession) error {
 	uc.log.Info("Creating test session")
 
 	// Бизнес-логика по созданию сессии
 	userID, userRole, ok := domain.UserFromContext(ctx)
 	if !ok {
 		uc.log.Error("Failed to get user from context")
-		return nil, domain.ErrUnauthorized
+		return domain.ErrUnauthorized
 	}
 
 	if !userRole.CanCreateSessions() {
 		uc.log.Warn("User does not have permission to create sessions", "userID", userID)
-		return nil, domain.ErrForbidden
+		return domain.ErrForbidden
 	}
 
 	// Fetch the template
-	template, err := uc.templateRepo.GetByID(ctx, templateID)
+	template, err := uc.templateRepo.GetByID(ctx, session.TemplateID)
 	if err != nil {
 		uc.log.Error("Failed to fetch template", "error", err)
-		return nil, err
+		return err
 	}
 
 	// Create the session
 	id := uuid.New().String()
-	session := &domain.TestSession{
-		ID:         domain.ID(id),
-		TemplateID: template.ID,
-		UserID:     userID,
-		StartedAt:  time.Now(),
-		ExpiredAt:  time.Now().Add(30 * time.Minute), // Например, сессия длится 30 минут
-		Questions:  make([]domain.Question, len(template.QuestionIDs)),
-	}
+	session.ID = domain.ID(id)
+	session.TemplateID = template.ID
+	session.UserID = userID
+	session.StartedAt = time.Now()
+	session.ExpiredAt = time.Now().Add(30 * time.Minute) // Например, сессия длится 30 минут
+	session.Questions = make([]domain.Question, len(template.QuestionIDs))
 
 	// Заполняем вопросы из шаблона
 	// Так как вопросы могут меняться, копируем их в сессию(делаем снимок)
 	questions, err := uc.questionRepo.GetByIDs(ctx, template.QuestionIDs)
 	if err != nil {
 		uc.log.Error("Failed to fetch questions for session", "error", err)
-		return nil, err
+		return err
 	}
 	session.Questions = questions
 
 	if err := uc.sessionRepo.CreateSession(ctx, session); err != nil {
 		uc.log.Error("Failed to create session", "error", err)
-		return nil, err
+		return err
 	}
 
 	uc.log.Info("Test session created successfully", "session_id", session.ID)
-	return session, nil
+	return nil
 }

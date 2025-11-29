@@ -26,13 +26,14 @@ func NewApp(cfg *parseconfig.Config, logger *slog.Logger) *gin.Engine {
 	// templateRepo := memory.NewTemplateRepository(memRepo)
 	questionRepo := postgres.NewQuestionRepository(db)
 	templateRepo := postgres.NewTemplateRepository(db)
+	sessionRepo := postgres.NewTestSessionRepository(db)
 
 	// Инициализация usecase слоев
 	questionUC := usecase.NewQuestionUseCase(questionRepo, logger)
 	templateUC := usecase.NewTemplateUseCase(templateRepo, questionRepo, logger)
-
+	sessionUC := usecase.NewSessionUseCase(sessionRepo, templateRepo, questionRepo, logger)
 	// Инициализация HTTP сервера и маршрутов
-	handler := v1.NewHandler(*questionUC, *templateUC, logger)
+	handler := v1.NewHandler(*questionUC, *templateUC, *sessionUC, logger)
 	router := httpServer.NewRouter(handler)
 
 	return router

@@ -24,6 +24,11 @@ func NewRouter(handler *v1.Handler) *gin.Engine {
 		templates.POST("/", handler.CreateTemplate)
 		templates.GET("/:id", handler.GetTemplateByID)
 		// templates.GET("", handler.ListTemplates)
+
+		// Sessions
+		sessions := api.Group("/sessions")
+		sessions.POST("/", handler.CreateSession)
+		// sessions.GET("/:id", handler.GetSessionByID)
 	}
 
 	return router
