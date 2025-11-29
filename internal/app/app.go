@@ -1,6 +1,7 @@
 package app
 
 import (
+	"embed"
 	"log/slog"
 
 	httpServer "github.com/Valery223/Question-Bank/internal/delivery/http_server"
@@ -10,7 +11,11 @@ import (
 	"github.com/Valery223/Question-Bank/internal/usecase"
 	db "github.com/Valery223/Question-Bank/pkg/postgres"
 	"github.com/gin-gonic/gin"
+	"github.com/pressly/goose/v3"
 )
+
+//go:embed migrations/*.sql
+var embedMigrations embed.FS // Эта переменная будет содержать реальные файлы внутри бинарника
 
 func NewApp(cfg *parseconfig.Config, logger *slog.Logger) *gin.Engine {
 
@@ -21,6 +26,20 @@ func NewApp(cfg *parseconfig.Config, logger *slog.Logger) *gin.Engine {
 		logger.Error("failed to connect to database", "error", err)
 		panic(err)
 	}
+
+	// Миграции
+	goose.SetBaseFS(embedMigrations)
+	if err := goose.SetDialect("postgres"); err != nil {
+		logger.Error("goose dialect error", "error", err)
+		panic(err)
+	}
+
+	if err := goose.Up(db, "migrations"); err != nil {
+		logger.Error("goose up migration error", "error", err)
+		panic(err)
+	}
+
+	logger.Info("database connected and migrated successfully")
 
 	// questionRepo := memory.NewQuestionsRepository(memRepo)
 	// templateRepo := memory.NewTemplateRepository(memRepo)

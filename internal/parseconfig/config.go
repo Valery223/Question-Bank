@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -15,11 +16,12 @@ type Config struct {
 }
 
 type DBConfig struct {
-	Host     string `yaml:"host" env-default:"localhost"`
-	Port     string `yaml:"port" env-default:"5432"`
-	User     string `yaml:"user" env-default:"postgres"`
-	Password string `yaml:"password" env-default:"password"`
-	Name     string `yaml:"name" env-default:"question_bank"`
+	Host string `yaml:"host" env:"DB_HOST" env-default:"localhost"`
+	Port string `yaml:"port" env:"DB_PORT" env-default:"5432"`
+	User string `yaml:"user" env:"DB_USER" env-default:"postgres"`
+	// Не указываем пароль и имя в yaml или указываем пустым
+	Password string `yaml:"password" env:"DB_PASSWORD" env-required:"true"`
+	Name     string `yaml:"name" env:"DB_NAME" env-default:"question_bank"`
 }
 
 func MustLoad() *Config {
@@ -28,7 +30,12 @@ func MustLoad() *Config {
 	flag.Parse()
 
 	if configPath == "" {
-		log.Fatal("config_path flag is required")
+		log.Println("No config path provided, using default 'config/local.yaml'")
+		configPath = "config/local.yaml"
+	}
+
+	if err := godotenv.Load(); err != nil {
+		log.Printf("Warning: No .env file found: %v", err)
 	}
 
 	// check if file exists
@@ -37,6 +44,9 @@ func MustLoad() *Config {
 	}
 
 	config := &Config{}
+	if err := cleanenv.ReadEnv(config); err != nil {
+		log.Printf("Warning: failed to read .env file: %v", err)
+	}
 	if err := cleanenv.ReadConfig(configPath, config); err != nil {
 		log.Fatalf("failed to load configuration: %v", err)
 	}
