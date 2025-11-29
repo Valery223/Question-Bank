@@ -1,14 +1,27 @@
-version: '3.8'
-
 services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    # Передаем переменные внутрь контейнера
+    environment:
+      - APP_ENV=dev
+      - DB_HOST=postgres  # Имя сервиса базы данных внутри сети Docker!
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_NAME=question_bank
+      - DB_PASSWORD=${DB_PASSWORD} 
+
   postgres:
     image: postgres:15.15
-    container_name: postgres_db
+    container_name: question_bank_db
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: question_bank
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:

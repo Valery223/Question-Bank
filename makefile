@@ -3,6 +3,7 @@
 APP_NAME=server
 # Путь к главному файлу
 MAIN_FILE=cmd/server/main.go
+# Путь к конфигу
 CONFIG_FILE=config/local.yaml
 
 all: build
@@ -36,21 +37,21 @@ test-cover:
 	rm coverage.out
 
 # Накатить миграции (вверх)
-migrate-up:
-	goose -dir migrations postgres $(DB_DSN) up
+# migrate-up:
+# 	goose -dir migrations postgres $(DB_DSN) up
 
-# Откатить последнюю миграцию (вниз)
-migrate-down:
-	goose -dir migrations postgres $(DB_DSN) down
+# # Откатить последнюю миграцию (вниз)
+# migrate-down:
+# 	goose -dir migrations postgres $(DB_DSN) down
 
 # Статус миграций
-migrate-status:
-	goose -dir migrations postgres $(DB_DSN) status
+# migrate-status:
+# 	goose -dir migrations postgres $(DB_DSN) status
 
 # Создать новую миграцию. Использование: make migrate-create NAME=add_users
 migrate-create:
 	@if [ -z "$(NAME)" ]; then echo "ERR: NAME is not set. Use: make migrate-create NAME=my_migration"; exit 1; fi
-	goose -dir migrations create $(NAME) sql
+	goose -dir internal/app/migrations create $(NAME) sql
 
 
 # Линтер (проверка кода на чистоту)
@@ -59,3 +60,9 @@ lint:
 
 clean:
 	rm -rf ./bin/
+
+docker-up:
+	docker-compose up -d
+
+docker-down:
+	docker-compose down
