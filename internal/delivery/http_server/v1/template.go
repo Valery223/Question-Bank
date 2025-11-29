@@ -44,3 +44,33 @@ func (h *Handler) GetTemplateByID(c *gin.Context) {
 	var resp = TemplateToResponse(template)
 	c.JSON(http.StatusOK, resp)
 }
+
+func (h *Handler) UpdateTemplate(c *gin.Context) {
+	var req UpdateTemplateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.errorResponse(c, http.StatusBadRequest, "invalid request body, "+err.Error())
+		return
+	}
+
+	t := req.ToDomain()
+	t.ID = domain.ID(c.Param("id"))
+
+	err := h.templateUC.UpdateTemplate(c.Request.Context(), t)
+	if err != nil {
+		h.errorResponse(c, http.StatusInternalServerError, "failed to update template, "+err.Error())
+		return
+	}
+
+	resp := TemplateToResponse(t)
+	c.JSON(http.StatusOK, gin.H{"status": "updated", "template": resp})
+}
+
+func (h *Handler) DeleteTemplate(c *gin.Context) {
+	id := c.Param("id")
+	err := h.templateUC.DeleteTemplate(c.Request.Context(), domain.ID(id))
+	if err != nil {
+		h.errorResponse(c, http.StatusInternalServerError, "failed to delete template, "+err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "deleted"})
+}

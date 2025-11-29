@@ -37,11 +37,11 @@ func (r *TestSessionRepository) CreateSession(ctx context.Context, session *doma
 	if session.UserID != "" {
 		sqlUserID = sql.NullString{
 			String: string(session.UserID),
-			Valid:  true, // ⚠️ Valid = true для не-NULL значений
+			Valid:  true, //  Valid = true для не-NULL значений
 		}
 	} else {
 		sqlUserID = sql.NullString{
-			Valid: false, // ⚠️ Valid = false для NULL
+			Valid: false, //  Valid = false для NULL
 		}
 	}
 
@@ -99,5 +99,7 @@ func (r *TestSessionRepository) GetSession(ctx context.Context, id domain.ID) (*
 }
 
 func (r *TestSessionRepository) DeleteSession(ctx context.Context, id domain.ID) error {
-	return nil
+	query := `DELETE FROM test_sessions WHERE id = $1`
+	_, err := r.db.ExecContext(ctx, query, id)
+	return err
 }

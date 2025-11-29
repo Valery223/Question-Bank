@@ -104,10 +104,16 @@ func (r *QuestionRepository) GetByIDs(ctx context.Context, ids []domain.ID) ([]d
 	return questions, nil
 }
 func (r *QuestionRepository) Delete(ctx context.Context, id domain.ID) error {
-	return nil
+	query := `DELETE FROM questions WHERE id = $1`
+	_, err := r.db.ExecContext(ctx, query, id)
+	return err
 }
 func (r *QuestionRepository) Update(ctx context.Context, q *domain.Question) error {
-	return nil
+	query := `UPDATE questions SET text = $1, role = $2, topic = $3, type = $4, difficulty = $5 WHERE id = $6`
+	_, err := r.db.ExecContext(ctx, query,
+		q.Text, q.Role, q.Topic, q.Type, q.Difficulty, q.ID,
+	)
+	return err
 }
 func (r *QuestionRepository) Filter(ctx context.Context, filter ports.QuestionFilter) ([]domain.Question, error) {
 	return nil, nil

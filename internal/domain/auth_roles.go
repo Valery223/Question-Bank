@@ -47,6 +47,18 @@ func (r UserRole) CanViewTemplates() bool {
 	return r == RoleAdmin || r == RoleManager
 }
 
+func (r UserRole) CanUpdateTemplates() bool {
+	return r == RoleAdmin || r == RoleManager
+}
+
 func (r UserRole) CanCreateSessions() bool {
 	return r == RoleAdmin || r == RoleManager || r == RoleUser
+}
+
+func (r UserRole) CanViewSessions() bool {
+	return r == RoleAdmin || r == RoleManager || r == RoleUser
+}
+
+func (r UserRole) CanViewAllSessions() bool {
+	return r == RoleAdmin || r == RoleManager
 }

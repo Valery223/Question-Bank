@@ -88,15 +88,29 @@ func (r *TemplateRepository) GetByID(ctx context.Context, id domain.ID) (*domain
 }
 
 func (r *TemplateRepository) GetByIDs(ctx context.Context, ids []domain.ID) ([]domain.TestTemplate, error) {
-	return nil, nil
+	templates := make([]domain.TestTemplate, 0, len(ids))
+	for _, id := range ids {
+		tt, err := r.GetByID(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		templates = append(templates, *tt)
+	}
+	return templates, nil
 }
 
 func (r *TemplateRepository) Delete(ctx context.Context, id domain.ID) error {
-	return nil
+	query := `DELETE FROM test_templates WHERE id = $1`
+	_, err := r.db.ExecContext(ctx, query, id)
+	return err
 }
 
 func (r *TemplateRepository) Update(ctx context.Context, tt *domain.TestTemplate) error {
-	return nil
+	query := `UPDATE test_templates SET name = $1, role = $2, purpose = $3 WHERE id = $4`
+	_, err := r.db.ExecContext(ctx, query,
+		tt.Name, tt.Role, tt.Purpose, tt.ID,
+	)
+	return err
 }
 
 func (r *TemplateRepository) Filter(ctx context.Context, filter ports.TemplateFilter) ([]domain.TestTemplate, error) {

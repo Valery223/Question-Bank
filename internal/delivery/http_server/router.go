@@ -17,18 +17,24 @@ func NewRouter(handler *v1.Handler) *gin.Engine {
 		questions := api.Group("/questions")
 		questions.POST("/", handler.CreateQuestion)
 		questions.GET("/:id", handler.GetQuestionByID)
+		questions.PUT("/:id", handler.UpdateQuestion)
+		questions.DELETE("/:id", handler.DeleteQuestion)
 		// questions.GET("", handler.ListQuestions)
 
 		// Templates
 		templates := api.Group("/templates")
 		templates.POST("/", handler.CreateTemplate)
 		templates.GET("/:id", handler.GetTemplateByID)
+		templates.PUT("/:id", handler.UpdateTemplate)
+		templates.DELETE("/:id", handler.DeleteTemplate)
 		// templates.GET("", handler.ListTemplates)
 
 		// Sessions
 		sessions := api.Group("/sessions")
 		sessions.POST("/", handler.CreateSession)
-		// sessions.GET("/:id", handler.GetSessionByID)
+		sessions.GET("/:id", handler.GetSessionByID)
+		// sessions.PUT("/:id", handler.UpdateSession)
+		// sessions.DELETE("/:id", handler.DeleteSession)
 	}
 
 	return router

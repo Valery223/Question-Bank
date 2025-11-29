@@ -74,3 +74,32 @@ func (uc *SessionUseCase) CreateSession(ctx context.Context, session *domain.Tes
 	uc.log.Info("Test session created successfully", "session_id", session.ID)
 	return nil
 }
+
+func (uc *SessionUseCase) GetSessionByID(ctx context.Context, id domain.ID) (*domain.TestSession, error) {
+	uc.log.Info("Getting test session by ID", "id", id)
+
+	userID, userRole, ok := domain.UserFromContext(ctx)
+	if !ok {
+		uc.log.Error("Failed to get user from context")
+		return nil, domain.ErrUnauthorized
+	}
+
+	if !userRole.CanViewSessions() {
+		uc.log.Warn("User does not have permission to view sessions", "userID", userID)
+		return nil, domain.ErrForbidden
+	}
+
+	sessin, err := uc.sessionRepo.GetSession(ctx, id)
+	if err != nil {
+		uc.log.Error("Failed to get session", "error", err)
+		return nil, err
+	}
+
+	// Дополнительная проверка: если сессия принадлежит другому пользователю и роль не позволяет просматривать все сессии
+	if sessin.UserID != userID && !userRole.CanViewAllSessions() {
+		uc.log.Warn("User does not have permission to view this session", "userID", userID, "sessionUserID", sessin.UserID)
+		return nil, domain.ErrForbidden
+	}
+
+	return sessin, nil
+}

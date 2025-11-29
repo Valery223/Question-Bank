@@ -3,6 +3,7 @@ package v1
 import (
 	"net/http"
 
+	"github.com/Valery223/Question-Bank/internal/domain"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,4 +25,16 @@ func (h *Handler) CreateSession(c *gin.Context) {
 	res := TestSessionToResponse(session)
 
 	c.JSON(http.StatusCreated, gin.H{"status": "created", "session": res})
+}
+
+func (h *Handler) GetSessionByID(c *gin.Context) {
+	id := c.Param("id")
+
+	session, err := h.sessionUC.GetSessionByID(c.Request.Context(), domain.ID(id))
+	if err != nil {
+		h.errorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	res := TestSessionToResponse(session)
+	c.JSON(http.StatusOK, res)
 }

@@ -1,6 +1,10 @@
 package domain
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestQuestion(t *testing.T) {
 	tests := []struct {
@@ -47,8 +51,13 @@ func TestQuestion(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.question.Validate()
-			if err != tt.wantError {
-				t.Errorf("Validate() = %v, want %v", err, tt.wantError)
+			// if err != tt.wantError {
+			// 	t.Errorf("Validate() = %v, want %v", err, tt.wantError)
+			// }
+			if tt.wantError == nil {
+				assert.NoError(t, err, "expected no error, but got one")
+			} else {
+				assert.EqualError(t, err, tt.wantError.Error(), "expected error does not match actual error")
 			}
 		})
 	}

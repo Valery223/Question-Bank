@@ -45,3 +45,34 @@ func (h *Handler) GetQuestionByID(c *gin.Context) {
 	resp := QuestionToResponse(q)
 	c.JSON(http.StatusOK, resp)
 }
+
+func (h *Handler) UpdateQuestion(c *gin.Context) {
+	var req UpdateQuestionRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.errorResponse(c, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	q := req.ToDomain()
+	q.ID = domain.ID(c.Param("id"))
+
+	err := h.questionUC.UpdateQuestion(c.Request.Context(), q)
+	if err != nil {
+		h.errorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	resp := QuestionToResponse(q)
+	c.JSON(http.StatusOK, gin.H{"status": "updated", "question": resp})
+}
+
+func (h *Handler) DeleteQuestion(c *gin.Context) {
+	id := c.Param("id")
+	err := h.questionUC.DeleteQuestion(c.Request.Context(), domain.ID(id))
+	if err != nil {
+		h.errorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "deleted"})
+}

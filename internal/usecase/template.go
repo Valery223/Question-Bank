@@ -127,3 +127,38 @@ func (uc *TemplateUseCase) DeleteTemplate(ctx context.Context, id domain.ID) err
 
 	return uc.templateRepo.Delete(ctx, id)
 }
+
+func (uc *TemplateUseCase) UpdateTemplate(ctx context.Context, tt *domain.TestTemplate) error {
+	uc.log.Info("Updating test template", "template", tt)
+
+	// Валидация шаблона
+	if err := tt.Validate(); err != nil {
+		uc.log.Error("Validation failed", "error", err)
+		return err
+	}
+
+	// Бизнес-логика по обновлению шаблона
+	userID, userRole, ok := domain.UserFromContext(ctx)
+	if !ok {
+		uc.log.Error("Failed to get user from context")
+		return domain.ErrUnauthorized
+	}
+
+	if !userRole.CanUpdateTemplates() {
+		uc.log.Warn("User does not have permission to update templates", "userID", userID)
+		return domain.ErrForbidden
+	}
+
+	// Проверяем, что все вопросы существуют
+	questions, err := uc.questionRepo.GetByIDs(ctx, tt.QuestionIDs)
+	if err != nil {
+		uc.log.Error("Failed to get questions for template", "error", err)
+		return err
+	}
+	if len(questions) != len(tt.QuestionIDs) {
+		uc.log.Warn("Some questions do not exist for the template", "expected", len(tt.QuestionIDs), "found", len(questions))
+		return errors.New("some questions do not exist for the template")
+	}
+
+	return uc.templateRepo.Update(ctx, tt)
+}
