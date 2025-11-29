@@ -6,7 +6,6 @@ import (
 	httpServer "github.com/Valery223/Question-Bank/internal/delivery/http_server"
 	v1 "github.com/Valery223/Question-Bank/internal/delivery/http_server/v1"
 	"github.com/Valery223/Question-Bank/internal/parseconfig"
-	"github.com/Valery223/Question-Bank/internal/repository/memory"
 	"github.com/Valery223/Question-Bank/internal/repository/postgres"
 	"github.com/Valery223/Question-Bank/internal/usecase"
 	db "github.com/Valery223/Question-Bank/pkg/postgres"
@@ -16,17 +15,17 @@ import (
 func NewApp(cfg *parseconfig.Config, logger *slog.Logger) *gin.Engine {
 
 	// Инициализация репозиториев
-	memRepo := memory.NewMemoryRepository()
+	// memRepo := memory.NewMemoryRepository()
 	db, err := db.NewPostgresDB(cfg.DB.Host, cfg.DB.Port, cfg.DB.User, cfg.DB.Password, cfg.DB.Name)
 	if err != nil {
 		logger.Error("failed to connect to database", "error", err)
 		panic(err)
 	}
-	dbRepo := postgres.NewQuestionRepository(db)
 
 	// questionRepo := memory.NewQuestionsRepository(memRepo)
-	questionRepo := dbRepo
-	templateRepo := memory.NewTemplateRepository(memRepo)
+	// templateRepo := memory.NewTemplateRepository(memRepo)
+	questionRepo := postgres.NewQuestionRepository(db)
+	templateRepo := postgres.NewTemplateRepository(db)
 
 	// Инициализация usecase слоев
 	questionUC := usecase.NewQuestionUseCase(questionRepo, logger)

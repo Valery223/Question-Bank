@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/Valery223/Question-Bank/internal/domain"
 	"github.com/Valery223/Question-Bank/internal/usecase/ports"
@@ -19,7 +18,6 @@ func NewQuestionRepository(db *sql.DB) *QuestionRepository {
 }
 
 func (r *QuestionRepository) Create(ctx context.Context, q *domain.Question) error {
-	fmt.Println("Inserting question into DB:", q)
 	// Начинаем транзакцию (так как вставляем в 2 таблицы: questions и options)
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -95,7 +93,15 @@ func (r *QuestionRepository) GetByID(ctx context.Context, id domain.ID) (*domain
 }
 
 func (r *QuestionRepository) GetByIDs(ctx context.Context, ids []domain.ID) ([]domain.Question, error) {
-	return nil, nil
+	questions := make([]domain.Question, 0, len(ids))
+	for _, id := range ids {
+		q, err := r.GetByID(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		questions = append(questions, *q)
+	}
+	return questions, nil
 }
 func (r *QuestionRepository) Delete(ctx context.Context, id domain.ID) error {
 	return nil
