@@ -1,0 +1,22 @@
+all: false
+dir: "internal/mocks"
+filename: "{{.InterfaceName}}.go"
+force-file-write: true
+formatter: goimports
+generate: true
+include-auto-generated: false
+log-level: info
+structname: '{{.Mock}}{{.InterfaceName}}'
+pkgname: 'mocks'
+recursive: false
+require-template-schema-exists: true
+template: testify
+template-schema: '{{.Template}}.schema.json'
+packages:
+  github.com/Valery223/Question-Bank/internal/usecase/ports:
+    config:
+      all: true
+  github.com/Valery223/Question-Bank/internal/delivery/http_server/v1:
+    config:
+      all: true
+  

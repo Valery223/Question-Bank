@@ -1,0 +1,86 @@
+basePath: /api/v1
+definitions:
+  v1.CreateQuestionRequest:
+    properties:
+      difficulty:
+        type: integer
+      options:
+        items:
+          $ref: '#/definitions/v1.OptionRequest'
+        minItems: 2
+        type: array
+      role:
+        type: string
+      text:
+        type: string
+      topic:
+        type: string
+      type:
+        type: string
+    required:
+    - difficulty
+    - options
+    - role
+    - text
+    - topic
+    - type
+    type: object
+  v1.OptionRequest:
+    properties:
+      is_answer:
+        description: false по умолчанию
+        type: boolean
+      text:
+        type: string
+    required:
+    - text
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API сервис для управления банком вопросов и генерации тестов.
+  title: Question Bank API
+  version: "1.0"
+paths:
+  /questions:
+    post:
+      consumes:
+      - application/json
+      description: Создает вопрос с вариантами ответов. Валидирует входные данные.
+      parameters:
+      - description: Данные вопроса
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateQuestionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: '{"status": "created"}'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка валидации JSON
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Создать новый вопрос
+      tags:
+      - questions
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

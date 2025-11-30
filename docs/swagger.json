@@ -1,0 +1,127 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API сервис для управления банком вопросов и генерации тестов.",
+        "title": "Question Bank API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/questions": {
+            "post": {
+                "description": "Создает вопрос с вариантами ответов. Валидирует входные данные.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "questions"
+                ],
+                "summary": "Создать новый вопрос",
+                "parameters": [
+                    {
+                        "description": "Данные вопроса",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateQuestionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{\"status\": \"created\"}",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации JSON",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "v1.CreateQuestionRequest": {
+            "type": "object",
+            "required": [
+                "difficulty",
+                "options",
+                "role",
+                "text",
+                "topic",
+                "type"
+            ],
+            "properties": {
+                "difficulty": {
+                    "type": "integer"
+                },
+                "options": {
+                    "type": "array",
+                    "minItems": 2,
+                    "items": {
+                        "$ref": "#/definitions/v1.OptionRequest"
+                    }
+                },
+                "role": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "topic": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.OptionRequest": {
+            "type": "object",
+            "required": [
+                "text"
+            ],
+            "properties": {
+                "is_answer": {
+                    "description": "false по умолчанию",
+                    "type": "boolean"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
