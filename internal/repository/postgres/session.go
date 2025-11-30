@@ -9,6 +9,7 @@ import (
 	"github.com/Valery223/Question-Bank/internal/domain"
 )
 
+// TestSessionRepository предоставляет методы для работы с сессиями тестирования в базе данных Postgres
 type TestSessionRepository struct {
 	db *sql.DB
 }

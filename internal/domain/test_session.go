@@ -2,6 +2,7 @@ package domain
 
 import "time"
 
+// TestSession представляет сессию тестирования пользователя
 type TestSession struct {
 	ID         ID
 	TemplateID ID
@@ -18,7 +19,7 @@ type TestSession struct {
 	Questions []Question
 }
 
-// Разные проверки
+// IsExpired проверяет, истекла ли сессия тестирования
 func (s *TestSession) IsExpired() bool {
 	// Логика: если  ExpiredAt в прошлом, то сессия истекла
 	return s.ExpiredAt.Before(time.Now())

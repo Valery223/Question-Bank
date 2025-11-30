@@ -7,6 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CreateQuestion godoc
+// @Summary      Создать новый вопрос
+// @Description  Создает вопрос с вариантами ответов. Валидирует входные данные.
+// @Tags         questions
+// @Accept       json
+// @Produce      json
+// @Param        input body      CreateQuestionRequest  true  "Данные вопроса"
+// @Success      201   {object}  map[string]string          "{"status": "created"}"
+// @Failure      400   {object}  map[string]string          "Ошибка валидации JSON"
+// @Failure      500   {object}  map[string]string          "Внутренняя ошибка сервера"
+// @Router       /questions [post]
 func (h *Handler) CreateQuestion(c *gin.Context) {
 	//  Биндинг + Валидация формата (Gin)
 	var req CreateQuestionRequest

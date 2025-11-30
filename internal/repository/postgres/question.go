@@ -9,14 +9,17 @@ import (
 	"github.com/google/uuid"
 )
 
+// QuestionRepository предоставляет методы для работы с вопросами в базе данных Postgres
 type QuestionRepository struct {
 	db *sql.DB
 }
 
+// NewQuestionRepository создает новый репозиторий вопросов
 func NewQuestionRepository(db *sql.DB) *QuestionRepository {
 	return &QuestionRepository{db: db}
 }
 
+// Create добавляет новый вопрос в базу данных
 func (r *QuestionRepository) Create(ctx context.Context, q *domain.Question) error {
 	// Начинаем транзакцию (так как вставляем в 2 таблицы: questions и options)
 	tx, err := r.db.BeginTx(ctx, nil)
@@ -61,6 +64,7 @@ func (r *QuestionRepository) Create(ctx context.Context, q *domain.Question) err
 	return nil
 }
 
+// GetByID возвращает вопрос по его ID
 func (r *QuestionRepository) GetByID(ctx context.Context, id domain.ID) (*domain.Question, error) {
 	q := &domain.Question{}
 	queryQ := `SELECT id, text, role, topic, type, difficulty FROM questions WHERE id = $1`
@@ -92,6 +96,7 @@ func (r *QuestionRepository) GetByID(ctx context.Context, id domain.ID) (*domain
 	return q, nil
 }
 
+// GetByIDs возвращает список вопросов по их ID
 func (r *QuestionRepository) GetByIDs(ctx context.Context, ids []domain.ID) ([]domain.Question, error) {
 	questions := make([]domain.Question, 0, len(ids))
 	for _, id := range ids {
@@ -103,11 +108,15 @@ func (r *QuestionRepository) GetByIDs(ctx context.Context, ids []domain.ID) ([]d
 	}
 	return questions, nil
 }
+
+// Delete удаляет вопрос по его ID
 func (r *QuestionRepository) Delete(ctx context.Context, id domain.ID) error {
 	query := `DELETE FROM questions WHERE id = $1`
 	_, err := r.db.ExecContext(ctx, query, id)
 	return err
 }
+
+// Update обновляет данные вопроса
 func (r *QuestionRepository) Update(ctx context.Context, q *domain.Question) error {
 	query := `UPDATE questions SET text = $1, role = $2, topic = $3, type = $4, difficulty = $5 WHERE id = $6`
 	_, err := r.db.ExecContext(ctx, query,
@@ -115,6 +124,10 @@ func (r *QuestionRepository) Update(ctx context.Context, q *domain.Question) err
 	)
 	return err
 }
+
+// Filter возвращает список вопросов, соответствующих заданным фильтрам
+//
+// Пока заглушка
 func (r *QuestionRepository) Filter(ctx context.Context, filter ports.QuestionFilter) ([]domain.Question, error) {
 	return nil, nil
 }

@@ -43,13 +43,15 @@ func NewRouter(handler *v1.Handler) *gin.Engine {
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Здесь проверяем JWT, сессию и т.д.
+		// Пока читаем просто из заголовков
+		// А может будет микросервис, который положит туда
 		userRole := c.GetHeader("User-Role")
 		userID := c.GetHeader("User-ID")
 
 		//  Сохраняем в gin.Context
 		c.Set("userID", userID)
 		c.Set("userRole", userRole)
-		// ИЛИ сохраняем в стандартный context
+		// или сохраняем в стандартный context
 		ctx := domain.NewContextWithUser(c.Request.Context(), domain.ID(userID), domain.UserRole(userRole))
 		c.Request = c.Request.WithContext(ctx)
 

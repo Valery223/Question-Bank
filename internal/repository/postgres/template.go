@@ -8,6 +8,7 @@ import (
 	"github.com/Valery223/Question-Bank/internal/usecase/ports"
 )
 
+// TemplateRepository предоставляет методы для работы с тестовыми шаблонами в базе данных Postgres
 type TemplateRepository struct {
 	db *sql.DB
 }

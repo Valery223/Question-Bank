@@ -14,11 +14,14 @@ var (
 	ErrForbidden         = errors.New("forbidden")
 )
 
-// Пусть  везде будет string ID
+// ID - строгий тип для идентификаторов сущностей
+//
+// Везде используется string(UUID) для простоты
 type ID string
 
 // --- Enums ---
 
+// QuestionType
 type QuestionType string
 
 const (
@@ -27,6 +30,7 @@ const (
 	TypeText         QuestionType = "text"
 )
 
+// IsValid проверяет, является ли тип вопроса допустимым
 func (qt QuestionType) IsValid() bool {
 	switch qt {
 	case TypeSingleChoice, TypeMultiChoice, TypeText:
@@ -36,6 +40,7 @@ func (qt QuestionType) IsValid() bool {
 	}
 }
 
+// RoleQuestionnaire - роль, для которой предназначен тестовый шаблон
 type RoleQuestionnaire string
 
 const (
@@ -44,6 +49,7 @@ const (
 	// Можно добавить новые
 )
 
+// IsValid проверяет, что роль является допустимой
 func (r RoleQuestionnaire) IsValid() bool {
 	switch r {
 	case RoleBackendJunior, RoleFrontendJunior:
@@ -53,6 +59,7 @@ func (r RoleQuestionnaire) IsValid() bool {
 	}
 }
 
+// TemplatePurpose - цель использования тестового шаблона
 type TemplatePurpose string
 
 const (
@@ -60,6 +67,7 @@ const (
 	PurposeMockInterview TemplatePurpose = "mock_interview"
 )
 
+// IsValid проверяет, что цель является допустимой
 func (tp TemplatePurpose) IsValid() bool {
 	switch tp {
 	case PurposeAssessment, PurposeMockInterview:
@@ -77,7 +85,7 @@ const (
 	MaxDifficulty Difficulty = 5
 )
 
-// Вспомогательный метод для проверки
+// IsValid проверяет, что уровень сложности в допустимых пределах
 func (d Difficulty) IsValid() bool {
 	return d >= MinDifficulty && d <= MaxDifficulty
 }

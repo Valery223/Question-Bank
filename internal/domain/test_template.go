@@ -1,11 +1,15 @@
 package domain
 
+// TestTemplate представляет шаблон теста с набором вопросов
 type TestTemplate struct {
 	ID      ID
 	Name    string
 	Role    RoleQuestionnaire
 	Purpose TemplatePurpose
 
+	// QuestionIDs содержит список ID вопросов, входящих в шаблон
+	//
+	// Порядок вопросов важен
 	QuestionIDs []ID // Список ID вопросов
 }
 

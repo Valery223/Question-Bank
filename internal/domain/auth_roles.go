@@ -11,6 +11,7 @@ const (
 	RoleGuest   UserRole = "guest"
 )
 
+// IsValid проверяет, что роль является допустимой
 func (r UserRole) IsValid() bool {
 	switch r {
 	case RoleAdmin, RoleManager, RoleUser, RoleGuest:
@@ -19,10 +20,14 @@ func (r UserRole) IsValid() bool {
 	return false
 }
 
+// Методы проверки прав для различных действий
+
+// CanCreateQuestions проверяет, может ли роль создавать вопросы
 func (r UserRole) CanCreateQuestions() bool {
 	return r == RoleAdmin || r == RoleManager
 }
 
+// CanDeleteQuestions проверяет, может ли роль удалять вопросы
 func (r UserRole) CanDeleteQuestions() bool {
 	return r == RoleAdmin
 }

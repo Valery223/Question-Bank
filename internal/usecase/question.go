@@ -24,6 +24,9 @@ func NewQuestionUseCase(qr ports.QuestionRepository, logger *slog.Logger) *Quest
 }
 
 // CreateQuestion - создает вопрос
+//
+// Включает валидацию и бизнес-логику
+// Так же присваивает уникальный ID вопросу
 func (uc *QuestionUseCase) CreateQuestion(ctx context.Context, q *domain.Question) error {
 	uc.log.Info("Creating question", "question", q)
 

@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// SessionUseCase - группирует логику вокруг сессий тестирования
 type SessionUseCase struct {
 	sessionRepo  ports.TestSessionRepository
 	templateRepo ports.TemplateRepository

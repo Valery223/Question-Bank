@@ -14,20 +14,21 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
+// Embedding миграций в бинарник
+//
 //go:embed migrations/*.sql
 var embedMigrations embed.FS // Эта переменная будет содержать реальные файлы внутри бинарника
 
 func NewApp(cfg *parseconfig.Config, logger *slog.Logger) *gin.Engine {
 
-	// Инициализация репозиториев
-	// memRepo := memory.NewMemoryRepository()
+	// 1. Подключение к базе данных
 	db, err := db.NewPostgresDB(cfg.DB.Host, cfg.DB.Port, cfg.DB.User, cfg.DB.Password, cfg.DB.Name)
 	if err != nil {
 		logger.Error("failed to connect to database", "error", err)
 		panic(err)
 	}
 
-	// Миграции
+	// 2. Миграции
 	goose.SetBaseFS(embedMigrations)
 	if err := goose.SetDialect("postgres"); err != nil {
 		logger.Error("goose dialect error", "error", err)
@@ -41,17 +42,17 @@ func NewApp(cfg *parseconfig.Config, logger *slog.Logger) *gin.Engine {
 
 	logger.Info("database connected and migrated successfully")
 
-	// questionRepo := memory.NewQuestionsRepository(memRepo)
-	// templateRepo := memory.NewTemplateRepository(memRepo)
+	// 3. Инициализация репозиториев
 	questionRepo := postgres.NewQuestionRepository(db)
 	templateRepo := postgres.NewTemplateRepository(db)
 	sessionRepo := postgres.NewTestSessionRepository(db)
 
-	// Инициализация usecase слоев
+	// 4. Инициализация usecase слоев
 	questionUC := usecase.NewQuestionUseCase(questionRepo, logger)
 	templateUC := usecase.NewTemplateUseCase(templateRepo, questionRepo, logger)
 	sessionUC := usecase.NewSessionUseCase(sessionRepo, templateRepo, questionRepo, logger)
-	// Инициализация HTTP сервера и маршрутов
+
+	// 5. Инициализация HTTP сервера и маршрутов
 	handler := v1.NewHandler(questionUC, templateUC, sessionUC, logger)
 	router := httpServer.NewRouter(handler)
 
